@@ -16,8 +16,10 @@ private string ReadFile(){
 
 SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
 
-|             Async                          Sycn             |
-|-------------------------------|-----------------------------|
-|            Task               |            void             |
-|         Task<string>          |           string            |
+|                |Async                          |Sync                         |
+|----------------|-------------------------------|-----------------------------|
+|Return Type     |`Task`                         |`'void'`                     |
+|Return Type          |`Task<string>`                 |`'string'`              |
+
+
 
