@@ -1,11 +1,5 @@
 # AsyncAndMultiThreadNotes
 
-void --> Task
-string --> Task<string>
-
-
-
-  
   ## Asycn İşlemlerin Tanımlanması
 
 SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
@@ -14,7 +8,6 @@ SmartyPants converts ASCII punctuation characters into "smart" typographic punct
 |----------------|-------------------------------|-----------------------------|
 |Return Type     |`Task`                         |`'void'`                     |
 |Return Type          |`Task<string>`                 |`'string'`              |
-
 
 
 ```csharp
