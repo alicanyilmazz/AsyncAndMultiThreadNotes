@@ -28,7 +28,7 @@ private async Task<string> ReadFileAsync(){
   string data = string.empty;
   using(StreamReader s = new StreamReader("filename.txt")){
     Task<string> mytask = s.ReadToEndAsync(); // IO Driver
-    
+    Task.Delay(5000); // Thread.Sleep() den farkı ana thread i bloklamaz sanki 5 sn lik bir işlem yapmışız gibi davranır. Task döndüğünden dolayı await ile işaretliyorum ki 5 sn boyunca orda beklesin.
     // örnek http client işlemi new HttpClient()
     
     data = await mytask;
@@ -40,3 +40,6 @@ private async Task<string> ReadFileAsync(){
 bu yüzden httpclient işlemi biter bitmez data = await mytask; işlemi çalıştırılacaktır.
 
 > 2.) Fakat dosya okuma işlemimiz 10 sn sürerken httpClient işlemimiz 3 sn sürer ise o zamanda dosya okuma işlemi bitmediğinden data = await mytask; kısmında durup dosyanın okunmasının bitmesini bekleyecektir.
+
+> Not : Async methodların illa yapacagı işlem için ekstra bir thread kullanmasına gerek yoktur. Dosyadan veri okuma , yazma ->  IO Driver a ve işletim sistemine devrediyor yani benim ana thread im yine boşa çıkıyor çünkü okuma işlemini devretti IO Driver ' a veya  httpClient().GetAsync("url") -> de de ekstra bir thread e ihtiyac yok Ağ kartı bu işi halleder.
+> Not 2 : Her async method thread kullanmaz dedik ama thread kullanamaz demedik thread kullandıgı , kullanabildiği durumlar da vardır.
