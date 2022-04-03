@@ -64,3 +64,16 @@ private async string BtnRealFile_Click(object sender , EventArgs e){
 > Yukarıdaki ReadFileAsync() asycn methodunun cagırımı.
 
 > Async ReadFileAsync() methodunu click methodunundan çağırırken async keyword ünü eklediğimize ve yine ReadFileAsync() önüne await attığımıza dikkat edelim. Peki await i daha sonra bir yerde atamazmıydık bu senaryoda atamadık zira hemen aldındaki richTextBox1.Text = data; satırında bu veriye ihtiyacımız var eğer ihtiyacımız olmayan baska işlemlerde olsaydı zaman alabilecek onlardan sonra await ile alır veriyi textboxt a basardık.
+
+### Olayı bir tik ilerletelim ve Method Çağırımında kullandığımız methoda eklemeler yapalım.
+
+```csharp
+private async string BtnRealFile_Click(object sender , EventArgs e){
+  string data = string.Empty;
+  Task<String> readFile = ReadFileAsync();
+  richTextBox2.Text = await new HttpClient().GetStringAsync("url");
+  data = await readFile;
+  richTextBox1.Text = data;
+}
+```
+
