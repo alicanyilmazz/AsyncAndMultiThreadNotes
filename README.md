@@ -27,7 +27,7 @@ private async derken compiler a bu method içerisinde bir async method çağır�
 private async Task<string> ReadFileAsync(){
   string data = string.empty;
   using(StreamReader s = new StreamReader("filename.txt")){
-    Task<string> mytask = s.ReadToEndAsync();
+    Task<string> mytask = s.ReadToEndAsync(); // IO Driver
     
     // örnek http client işlemi new HttpClient()
     
