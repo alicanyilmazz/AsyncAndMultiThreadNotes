@@ -28,7 +28,7 @@ private async Task<string> ReadFileAsync(){
   string data = string.empty;
   using(StreamReader s = new StreamReader("filename.txt")){
     Task<string> mytask = s.ReadToEndAsync(); // IO Driver
-    Task.Delay(5000); // Thread.Sleep() den farkı ana thread i bloklamaz sanki 5 sn lik bir işlem yapmışız gibi davranır. Task döndüğünden dolayı await ile işaretliyorum ki 5 sn boyunca orda beklesin.
+    await Task.Delay(5000); // Thread.Sleep() den farkı ana thread i bloklamaz sanki 5 sn lik bir işlem yapmışız gibi davranır. Task döndüğünden dolayı await ile işaretliyorum ki 5 sn boyunca orda beklesin.
     // örnek http client işlemi new HttpClient()
     
     data = await mytask;
