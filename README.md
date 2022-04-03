@@ -43,3 +43,24 @@ bu yüzden httpclient işlemi biter bitmez data = await mytask; işlemi çalış
 
 > Not : Async methodların illa yapacagı işlem için ekstra bir thread kullanmasına gerek yoktur. Dosyadan veri okuma , yazma ->  IO Driver a ve işletim sistemine devrediyor yani benim ana thread im yine boşa çıkıyor çünkü okuma işlemini devretti IO Driver ' a veya  httpClient().GetAsync("url") -> de de ekstra bir thread e ihtiyac yok Ağ kartı bu işi halleder.
 > Not 2 : Her async method thread kullanmaz dedik ama thread kullanamaz demedik thread kullandıgı , kullanabildiği durumlar da vardır.
+
+### Method un Çağırımı
+
+```csharp
+private string BtnRealFile_Click(object sender , EventArgs e){
+  string data = ReadFile();
+  richTextBox1.Text = data;
+}
+```
+> Yukarıdaki ReadFile() sync methodunun cagırımı.
+
+```csharp
+private async string BtnRealFile_Click(object sender , EventArgs e){
+  string data = await ReadFileAsync();
+  richTextBox1.Text = data;
+}
+```
+
+> Yukarıdaki ReadFileAsync() asycn methodunun cagırımı.
+
+> Async ReadFileAsync() methodunu click methodunundan çağırırken async keyword ünü eklediğimize ve yine ReadFileAsync() önüne await attığımıza dikkat edelim. Peki await i daha sonra bir yerde atamazmıydık bu senaryoda atamadık zira hemen aldındaki richTextBox1.Text = data; satırında bu veriye ihtiyacımız var eğer ihtiyacımız olmayan baska işlemlerde olsaydı zaman alabilecek onlardan sonra await ile alır veriyi textboxt a basardık.
