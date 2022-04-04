@@ -595,4 +595,5 @@ https://www.netflix.com
 https://www.apple.com
 ```
 >  Dikkat ederseniz methodumuzda 12 nolu thread görev alıyor. Tek bir thread bloklanmadan asenkron bir şekilde 4 kez methodu çalıştırmış.Duruma göre birden fazla thread de metoduza girebilirdi.
+
 >  Bu methoda arka arkaya milisaniyeler içerisinde girdiğinden dolayı(bloklanmadığı) için bu sonucu aldık.
