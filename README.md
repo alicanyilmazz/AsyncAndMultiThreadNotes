@@ -358,3 +358,81 @@ GetContentAsync thread 7
 https://www.apple.com - 68403 
 ```
 > Aralarında en hızlı biten olan Task işlmei -> apple.com bize döndü.
+
+### WaitAll Kullanımı
+> WhenAll methodu parametre olarak bir Task Array i alır ve Array içerisindeki taskler tamamlanana kadar beklemektedir.
+
+> Yalnız WhenAll methodundan farkı şudur WhenAll methodu bizim Main Thread(UI Thread) mizi bloklamıyorken WaitAll methodu bloklama işlemi gerçekleştirmektedir.
+
+> Yani WaitAll dan sonra bizim Main Thread(UI Thread) imiz bloklanıyor ve alt satıra gecmiyor veya WinForm kullanıyorsanız kullanıcı etkileşimlerine cevap vermeyecektir.
+
+> WhenAll dan İkinci önemli farkı ise WaitAll methodu parametre olarak milisaniye cinsinden veri alıyor diyelim ki 3000 milisaniye verdiğiniz zaman WaitAll artık geriye true yada false dönüyor.
+
+> Yani vermiş oldugumuz süre içerisinde WaitAll(task1,task2,task3,task4) içerisindeki görevler tamamlanırsa true tamamlanamazsa false döner.
+
+> Eğer WaitAll ' a milisaniye cinsinden parametresini vermezseniz geriye hiçbirsey dönmez dönüş tipi void olur.
+
+```csharp
+namespace TaskSamples
+{
+    public class Content
+    {
+        public string Site { get; set; }
+        public int Len { get; set; }
+    }
+
+    internal class Program
+    {
+        async static Task Main(string[] args)
+        {
+            Console.WriteLine("Main Thread: "+Thread.CurrentThread.ManagedThreadId);
+            List<string> urlList = new List<string>()
+            {
+                "https://www.google.com",
+                "https://www.microsoft.com",
+                "https://www.amazon.com",
+                "https://www.netflix.com",
+                "https://www.apple.com"
+            };
+
+            List<Task<Content>> taskList = new List<Task<Content>>();
+
+            urlList.ToList().ForEach(x =>
+            {
+                taskList.Add(GetContentAsync(x));
+            });
+
+            Console.WriteLine("WaitAll methodundan önce");
+            Task.WaitAll(taskList.ToArray());
+            Console.WriteLine("WaitAll methodundan sonra");
+            
+            Console.WriteLine($"{taskList.First().Result.Site} - {taskList.First().Result.Len}");
+
+        }
+        public static async Task<Content> GetContentAsync(string url)
+        {
+            Content c = new Content();
+            var data = await new HttpClient().GetStringAsync(url);
+
+            c.Site = url;
+            c.Len = data.Length;
+            Console.WriteLine("GetContentAsync thread " + Thread.CurrentThread.ManagedThreadId);
+            return c;
+        }
+    }
+}
+
+```
+
+> OUTPUT :
+```comment
+ Main Thread: 1
+WaitAll methodundan önce
+GetContentAsync thread 7
+GetContentAsync thread 7
+GetContentAsync thread 7
+GetContentAsync thread 7
+GetContentAsync thread 7
+WaitAll methodundan sonra
+https://www.google.com - 49788
+```
