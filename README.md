@@ -118,5 +118,26 @@ namespace TaskSamples
         }
     }
 }
-> Peki ContinueWith i iptal edip yapsakdık
 ```
+> Peki ContinueWith i iptal aynı kodu async - await kullanarak yapsaydık o zamanda kodumuz aşağıdaki gibi olurdu.
+
+```csharp
+namespace TaskSamples
+{
+    internal class Program
+    {
+        async static Task Main(string[] args)
+        {
+            Console.WriteLine("Hello World!"); // 1 burası çalışır ilk olarak.
+
+            var mytask = new HttpClient().GetStringAsync("https://www.google.com").ContinueWith((data) =>
+            {
+                Console.WriteLine("The length of the data" + data.Result.Length); // 4 burası çalışır.
+            });
+
+            Console.WriteLine("arada yapılacak işler"); // 2 burası çalışır çünkü await atmadık üste
+
+            await mytask; // 3 burası çalışır 
+        }
+    }
+}
