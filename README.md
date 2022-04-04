@@ -436,3 +436,71 @@ GetContentAsync thread 7
 WaitAll methodundan sonra
 https://www.google.com - 49788
 ```
+
+### WaitAny Kullanımı
+> WaitAny methodu da çağırıldığı thread i (Main Thread üzerinden çağırdıysan Main thread i UI Thread üzerinden çağırdıysanız UI Thread i bloklar.) bloklar.
+
+> WaitAny methodu Task Array i almaktadır. Array olarak aldığı Task lerden herhangi biri tamamlandığı zaman bir integer değer döner dönmüş olduğu integer değer ise tamamlanan task in index numarasıdır.
+
+> Bu index numarası üzerinden tamamlanan task i alabilirsiniz.
+
+```csharp
+
+namespace TaskSamples
+{
+    public class Content
+    {
+        public string Site { get; set; }
+        public int Len { get; set; }
+    }
+
+    internal class Program
+    {
+        async static Task Main(string[] args)
+        {
+            Console.WriteLine("Main Thread: "+Thread.CurrentThread.ManagedThreadId);
+            List<string> urlList = new List<string>()
+            {
+                "https://www.google.com",
+                "https://www.microsoft.com",
+                "https://www.amazon.com",
+                "https://www.netflix.com",
+                "https://www.apple.com"
+            };
+
+            List<Task<Content>> taskList = new List<Task<Content>>();
+
+            urlList.ToList().ForEach(x =>
+            {
+                taskList.Add(GetContentAsync(x));
+            });
+
+            Console.WriteLine("WaitAny methodundan önce");
+     
+            var firstTaskIndex = Task.WaitAny(taskList.ToArray()); // ilk tamamlanan task in index bilgisini dönecek.
+
+            Console.WriteLine($"{taskList[firstTaskIndex].Result.Site} - {taskList[firstTaskIndex].Result.Len}");
+
+        }
+        public static async Task<Content> GetContentAsync(string url)
+        {
+            Content c = new Content();
+            var data = await new HttpClient().GetStringAsync(url);
+
+            c.Site = url;
+            c.Len = data.Length;
+            Console.WriteLine("GetContentAsync thread " + Thread.CurrentThread.ManagedThreadId);
+            return c;
+        }
+    }
+}
+
+```
+
+> OUTPUT :
+```comment
+Main Thread: 1
+WaitAny methodundan önce
+GetContentAsync thread 7
+https://www.apple.com - 68403
+```
