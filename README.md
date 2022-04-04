@@ -504,3 +504,95 @@ WaitAny methodundan önce
 GetContentAsync thread 7
 https://www.apple.com - 68403
 ```
+
+### Task.Delay() Kullanımı
+> Asenkron bir şekilde gecikme gerçekleştirir. Ama bu geciktirmeyi gerçekleştirirkende güncel thread i bloklamaz. Birde Thread imizin Sleep methodu vardı.
+
+> Sleep methodu Main or UI Thread imizi bloklarken Delay methodu herhangi bir sekilde UI veya Main Thread i bloklamaz.
+
+
+```csharp
+
+namespace TaskSamples
+{
+    public class Content
+    {
+        public string Site { get; set; }
+        public int Len { get; set; }
+    }
+
+    internal class Program
+    {
+        async static Task Main(string[] args)
+        {
+            Console.WriteLine("Main Thread: "+Thread.CurrentThread.ManagedThreadId);
+            List<string> urlList = new List<string>()
+            {
+                "https://www.google.com",
+                "https://www.microsoft.com",
+                "https://www.amazon.com",
+                "https://www.netflix.com",
+                "https://www.apple.com"
+            };
+
+            List<Task<Content>> taskList = new List<Task<Content>>();
+
+            urlList.ToList().ForEach(x =>
+            {
+                taskList.Add(GetContentAsync(x));
+            });
+
+            Console.WriteLine("WaitAny methodundan önce");
+     
+            var contents = await Task.WhenAll(taskList);
+            contents.ToList().ForEach(x =>
+            {
+                Console.WriteLine(x.Site);
+            });
+
+        }
+        public static async Task<Content> GetContentAsync(string url)
+        {
+            Content c = new Content();
+            var data = await new HttpClient().GetStringAsync(url);
+
+            await Task.Delay(5000);
+            // Biz 5 kere istek yapacağız ve her biri için 5 sn bekleyecek fakat suna dikkat
+            // Async olarak işlem yapıyoruz ve Delay Main thread i bloklamıyor
+            // O yuzden 
+            // 5sn
+            // 5sn
+            // 5sn  --> Bunların hepsi art arda fonksiyona girecek bu sayede milisaniyeler aralarında fark olacagından neredeyse 5 i için 5*5 = 20 saniye değil
+            // 5sn  --> toplamda yaklaşık olarak 5 sn beklemiş olacagız eğer asenkron değilde senkron olarak bu işlemi yapsakdık 20 sn olurdu burdaki farka dikkat edelim.
+            // 5sn
+
+            // Thread.Sleep(); -> kullansaydık mevcut thread i 5 sn boyunca bloklayacaktı.
+         
+
+            c.Site = url;
+            c.Len = data.Length;
+            Console.WriteLine("GetContentAsync thread " + Thread.CurrentThread.ManagedThreadId);
+            return c;
+        }
+    }
+}
+
+```
+
+> OUTPUT :
+```comment
+Main Thread: 1
+WaitAny methodundan önce
+GetContentAsync thread 12
+GetContentAsync thread 12
+GetContentAsync thread 12
+GetContentAsync thread 12
+GetContentAsync thread 12
+https://www.google.com
+https://www.microsoft.com
+https://www.amazon.com
+https://www.netflix.com
+https://www.apple.com
+```
+>  Dikkat ederseniz methodumuzda 12 nolu thread görev alıyor. Tek bir thread bloklanmadan asenkron bir şekilde 4 kez methodu çalıştırmış.Duruma göre birden fazla thread de metoduza girebilirdi.
+>  Bu methoda arka arkaya milisaniyeler içerisinde girdiğinden dolayı(bloklanmadığı) için bu sonucu aldık.
