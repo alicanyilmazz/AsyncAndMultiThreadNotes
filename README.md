@@ -597,3 +597,16 @@ https://www.apple.com
 >  Dikkat ederseniz methodumuzda 12 nolu thread görev alıyor. Tek bir thread bloklanmadan asenkron bir şekilde 4 kez methodu çalıştırmış.Duruma göre birden fazla thread de metoduza girebilirdi.
 
 >  Bu methoda arka arkaya milisaniyeler içerisinde girdiğinden dolayı(bloklanmadığı) için bu sonucu aldık.
+
+### Run() Methodu Kullanımı
+> Daha öncede demiştik async methodlar illaki thread kullanmaz thread kullanacağı durumlarda olur kullanmayacağı durumlarda olur. Bizim ilgilendiğimiz nokta async methodumuzu çağırdığımızda o anki thread imizin bloklanmamasıdır.
+
+```csharp
+
+
+```
+
+> OUTPUT :
+```comment
+
+```
