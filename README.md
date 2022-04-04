@@ -88,6 +88,7 @@ private Task<string> ReadFileAsync2(){
 }
 ```
 > Using Blogu kullanmadık cunku işlem async olarak ilerliyor be await kullanmadıgımızdan dosya okuma işlemi bitmeden StreamReader dispose oluyor ondan hata almamak için using i kaldırdık.
+
 > Dikkat ! : Async methodu  `ReadToEndAsync();` methodu await ile kullanmadığımız direkt döndüğümüz için async - await ikilisine ihtiyacımız yok. 
 
 > Not: async - await ikilisini async bir method çağırdıktan sonra geriye direkt döneceksem kullanmama gerek yok ama o işlem bitene kadar arada başka işlemler daha yaptıracaksam evet o zaman kullanmamız mantıklı olur.
