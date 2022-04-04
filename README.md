@@ -238,3 +238,62 @@ https://www.netflix.com length : 431898
 https://www.apple.com length : 68403
 ```
 > Dikkat : Gördüğünüz async işlemlerde illa thread kullanılacak diye bir şart yok dedik ama kullanabilir de dedik burda thread id lerinden de gördünüz gibi async bu işlemde 1 -> Main thread, 11 ve 12 id li thread lerde kullanılmıştır.
+
+> Aşağıdaki gibi de kullanabilirsiniz.
+
+```csharp
+
+namespace TaskSamples
+{
+    public class Content
+    {
+        public string Site { get; set; }
+        public int Len { get; set; }
+    }
+
+    internal class Program
+    {
+        async static Task Main(string[] args)
+        {
+            Console.WriteLine("Main Thread: "+Thread.CurrentThread.ManagedThreadId);
+            List<string> urlList = new List<string>()
+            {
+                "https://www.google.com",
+                "https://www.microsoft.com",
+                "https://www.amazon.com",
+                "https://www.netflix.com",
+                "https://www.apple.com"
+            };
+
+            List<Task<Content>> taskList = new List<Task<Content>>();
+
+            urlList.ToList().ForEach(x =>
+            {
+                taskList.Add(GetContentAsync(x));
+            });
+
+            var content = Task.WhenAll(taskList.ToArray());
+
+            Console.WriteLine("WhenAll method undan sonra başka işlemler yapıldı.");
+
+            var data = await content;
+
+            data.ToList().ForEach(x =>
+            {
+                Console.WriteLine($"{x.Site} length : {x.Len}");
+            });
+        }
+        public static async Task<Content> GetContentAsync(string url)
+        {
+            Content c = new Content();
+            var data = await new HttpClient().GetStringAsync(url);
+
+            c.Site = url;
+            c.Len = data.Length;
+            Console.WriteLine("GetContentAsync thread " + Thread.CurrentThread.ManagedThreadId);
+            return c;
+        }
+    }
+}
+
+```
