@@ -237,3 +237,4 @@ https://www.amazon.com length : 434868
 https://www.netflix.com length : 431898
 https://www.apple.com length : 68403
 ```
+> Dikkat : Gördüğünüz async işlemlerde illa thread kullanılacak diye bir şart yok dedik ama kullanabilir de dedik burda thread id lerinden de gördünüz gibi async bu işlemde 1 -> Main thread, 11 ve 12 id li thread lerde kullanılmıştır.
