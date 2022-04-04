@@ -79,3 +79,13 @@ private async string BtnRealFile_Click(object sender , EventArgs e){
 > Burada öenmli bir şeyi tekrar edelim , okuma işlemi uzun sürerse yukarıda  `data = await readFile;` kısmında bekleyecek fakat bu bizim main thread imizi bloklamıyor.
 
 > Main thread bloklanmaz okuma işlemi ilgili IO Driver dan veri gelene kadar orda beklenilir Main thread bu iş için bloklanmaz.
+
+> !NOT : Şimdi de async - await kullanmadan ReadFile methodunu yazalım.
+```csharp
+private Task<string> ReadFileAsync2(){
+  using(StreamReader s = new StreamReader("filename.txt")){
+    return s.ReadToEndAsync();
+  }
+}
+```
+> Dikkat ! : Async methodu  `ReadToEndAsync();` methodu await ile kullanmadığımız direkt döndüğümüz için async - await ikilisine ihtiyacımız yok.
