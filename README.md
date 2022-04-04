@@ -169,3 +169,71 @@ namespace TaskSamples
 
 
 ```
+### WhenAll Kullanımı
+> WhenAll methodu parametre olarak bir Task Array i alır ve Array içerisindeki Task lerin hepsi tamamlanıncaya kadar bekler. Yani WhenAll methodunu kullandığımızda bu satırdan sonraki kod satırına geçildiğinde WhenAll Array inin içerisindeki Task lerin hepsi bitmiş olur. 
+
+```csharp
+namespace TaskSamples
+{
+    public class Content
+    {
+        public string Site { get; set; }
+        public int Len { get; set; }
+    }
+
+    internal class Program
+    {
+        async static Task Main(string[] args)
+        {
+            Console.WriteLine("Main Thread: "+Thread.CurrentThread.ManagedThreadId);
+            List<string> urlList = new List<string>()
+            {
+                "https://www.google.com",
+                "https://www.microsoft.com",
+                "https://www.amazon.com",
+                "https://www.netflix.com",
+                "https://www.apple.com"
+            };
+
+            List<Task<Content>> taskList = new List<Task<Content>>();
+
+            urlList.ToList().ForEach(x =>
+            {
+                taskList.Add(GetContentAsync(x));
+            });
+
+            var content = await Task.WhenAll(taskList.ToArray());
+
+            content.ToList().ForEach(x =>
+            {
+                Console.WriteLine($"{x.Site} length : {x.Len}");
+            });
+        }
+        public static async Task<Content> GetContentAsync(string url)
+        {
+            Content c = new Content();
+            var data = await new HttpClient().GetStringAsync(url);
+
+            c.Site = url;
+            c.Len = data.Length;
+            Console.WriteLine("GetContentAsync thread " + Thread.CurrentThread.ManagedThreadId);
+            return c;
+        }
+    }
+}
+
+```
+> OUTPUT :
+```comment
+ Main Thread: 1
+GetContentAsync thread 11
+GetContentAsync thread 11
+GetContentAsync thread 12
+GetContentAsync thread 12
+GetContentAsync thread 12
+https://www.google.com length : 49747
+https://www.microsoft.com length : 181526
+https://www.amazon.com length : 434868
+https://www.netflix.com length : 431898
+https://www.apple.com length : 68403
+```
