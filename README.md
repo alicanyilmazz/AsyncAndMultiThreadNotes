@@ -143,3 +143,29 @@ namespace TaskSamples
 }
 
 ```
+> Şimdide ContinueWith i kodumuzu uzatmadan baska biryerde olusturdugumuz method u cagırırken nasıl kullanacagız.
+
+```csharp
+namespace TaskSamples
+{
+    internal class Program
+    {
+        public static void run(Task<string> data)
+        {
+            Console.WriteLine("The length of the data" + data.Result.Length);
+        }
+        async static Task Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+
+            var mytask = new HttpClient().GetStringAsync("https://www.google.com").ContinueWith(run);
+
+            Console.WriteLine("arada yapılacak işler"); 
+
+            await mytask;
+        }
+    }
+}
+
+
+```
