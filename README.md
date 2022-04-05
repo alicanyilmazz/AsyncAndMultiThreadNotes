@@ -704,3 +704,17 @@ namespace ThreadSample
 // is keyword ü --> obj is Status; --> obj i Status a çevirebilirse true çeviremezse false döner
 
 ```
+
+### FromResult() Methodu Kullanımı
+
+> FromResult() methodu da parametre olarak bir obje almaktadır. Almış olduğu bu obje değerini geriye bir Task nesne örneği ile beraber dönmektedir.
+
+> Yani bir method dan geriye daha önce almış oldugunuz statik bir datayı dönmek istiyorsanız FromResult() methodunu kullanabilirsiniz.
+
+> Genelde biz bu methodu cache lenmiş datayı dönmek için kullanırız.
+
+```csharp
+
+
+
+```
