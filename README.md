@@ -657,3 +657,24 @@ https://www.apple.com
  }
 
 ```
+### StartNew() Methodu Kullanımı
+> StartNew() methodu da Run() methodu da yazmış olduğumuz kodları ayrı bir thread üzerinde çalıştırır.
+
+> Peki Run() methodundan farkı nedir? Run() methoduna Task imizi oluştururken bir obje geçemiyorken StartNew() methoduna bir obje geçebiliyoruz.
+
+```csharp
+
+ private void btnStart_Click(object sender , EventArgs e){
+      Go(progressBar1);
+      Go(progressBar2);
+ }
+ 
+ public void Go(ProgressBar pb){
+    Enumerable.Range(1,100).ToList().ForEach(x =>
+    {
+        Thread.Sleep(100);
+        pb.Value = x;
+    });
+ }
+
+```
