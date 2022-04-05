@@ -658,23 +658,49 @@ https://www.apple.com
 
 ```
 ### StartNew() Methodu Kullanımı
+
 > StartNew() methodu da Run() methodu da yazmış olduğumuz kodları ayrı bir thread üzerinde çalıştırır.
 
 > Peki Run() methodundan farkı nedir? Run() methoduna Task imizi oluştururken bir obje geçemiyorken StartNew() methoduna bir obje geçebiliyoruz.
 
+> Task işlemi bittiğinde StartNew() methoduna geçmiş olduğumuz objeyi alabiliyoruz. Bu obje dediğimiz herhangi bir value type veya reference type da olabilir.
+
+> Tipi obje kısacası yani c# da object tüm sınıfların en üst sınıfı oldugundan dolayı her tipe cast işlemi gerçekleştirebilirsiniz.
+
+> Kısaca bir Task iniz çalışırken bir obje göndermek istiyorsanız ve arkasından da bu çalışma bittikten sonra bu objeyi elde etmek istiyorsanız kullanabileceğiniz bir method'dur.
+
 ```csharp
 
- private void btnStart_Click(object sender , EventArgs e){
-      Go(progressBar1);
-      Go(progressBar2);
- }
- 
- public void Go(ProgressBar pb){
-    Enumerable.Range(1,100).ToList().ForEach(x =>
+namespace ThreadSample
+{
+    internal class Program
     {
-        Thread.Sleep(100);
-        pb.Value = x;
-    });
- }
+        public class Status
+        {
+            public int threadId { get; set; }
+            public DateTime date { get; set; }
+        }
+        async static Task Main(string[] args)
+        {
+            var myTask = Task.Factory.StartNew((obj) =>
+            {
+                Console.WriteLine("My Task Runned.");
+                var status = obj as Status; // Aynı obje buraya da geldiğinden "date" property si dolu olarak gelecektir. // Status geleceğini 2. parametreden geldiği için biliyorum ve Status a cast ediyoruz.
+                status.threadId = Thread.CurrentThread.ManagedThreadId;
+
+            },new Status() { date = DateTime.Now});
+
+            await myTask;
+
+            Status status = myTask.AsyncState as Status;
+            
+            Console.WriteLine(status.date);
+            Console.WriteLine(status.threadId);
+        }
+    }
+}
+
+// as keyword ü --> obj as Status; --> obj i Status a çevirebilirse çevirir çeviremezse geriye null döner.
+// is keyword ü --> obj is Status; --> obj i Status a çevirebilirse true çeviremezse false döner
 
 ```
