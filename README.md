@@ -601,12 +601,59 @@ https://www.apple.com
 ### Run() Methodu Kullanımı
 > Daha öncede demiştik async methodlar illaki thread kullanmaz thread kullanacağı durumlarda olur kullanmayacağı durumlarda olur. Bizim ilgilendiğimiz nokta async methodumuzu çağırdığımızda o anki thread imizin bloklanmamasıdır.
 
-```csharp
+> Asenkron programlamanın mantığında bu var.
 
+> Peki biz bazı kodlarımızı ayrı bir thread üzerinde çalıştırmak istersek ne yapmamız gerekiyor , işte burada Task sınıfımızın Run() methodu devreye giriyor.
+
+> Run() methodu içerisinde yazmış olduğumuz kodlar tamamen ayrı bir thread üzerinde çalışır. 
+
+> Yani bizzat biz bu kodların ayrı bir thread üzerinde çalışması gerektiğini bildirmiş oluyoruz.
+
+> Genelde bizim işlemleri asenkron olarak çalıştırmamız mantıklıdır herşey için ayrı thread açılmaz. 
+
+> Mesela yogun matematiksel işlemlerin olduğu bir methodumuz var trigonometri , integral vb içeren işte bu gibi durumlar da  bunu ayrı thread üzerinde çalıştırmak mantıklıdır.
+
+> Aşağıda iki tane progressbar yüklenmesi kodunun senkron olarak çalışması verilmiştir.
+> Tabiki 2 progresBar yüklenene kadar UI Thread imiz bloklanacağından kullanıcı hiçbir işlem yapmayacaktır.
+
+```csharp
+ private void btnStart_Click(object sender , EventArgs e){
+      Go(progressBar1);
+      Go(progressBar2);
+ }
+ 
+ public void Go(ProgressBar pb){
+    Enumerable.Range(1,100).ToList().ForEach(x =>
+    {
+        Thread.Sleep(100);
+        pb.Value = x;
+    });
+ }
 
 ```
 
-> OUTPUT :
-```comment
+> Run() methodu içerisine yazdığımızdan dolayı artık Go methodunu 2 kere cagırdık bunlarda ayrı ayrı threadlerda çalıştırılacaktır ve asenkron olarak.
+
+> Thread.Sleep(100); amacı senkronda kod o kadar hızlı çalışıyorki biz uı da 2 progress bar sanki aynı anda yükeniyor gibi görüyoruz işte bu dur kalk şeklinde yüklenme görüntüsünü sağlamak için kullanılıyor tabiki bunu Main Thread i bloklayarak yapıyor.
+
+> Fakat şuna dikkat edelim Run() methodu içerisine aldığımızda 2 ayrı thread oluşuyor ve bu ayrı thread Thread.Sleep(100); ayrı ayrı bloklanıyor ama asenkron olarak çalışıyorlar ve progressBarların 2 side beraber dolmaya başladığını olarak görebiliriz.
+
+```csharp
+ private async void btnStart_Click(object sender , EventArgs e){
+      var aTask = Go(progressBar1);
+      var bTask = Go(progressBar2);
+      await Task.WhenAll(aTask,bTask);
+ }
+ 
+ public async Task Go(ProgressBar pb){
+    await Task.Run(() =>
+    {
+         Enumerable.Range(1,100).ToList().ForEach(x =>
+        {
+             Thread.Sleep(100);
+             pb.Invoke((MethodInvoker) delegate { pb.Value = x; }); // pb.Value = x; kaldırdık cunku winForm UI elementine UI Thread dışında başka bir thread üzerinden erişmemize izin vermiyor yani olay WinForm ile alakalı Run() methodu ile alakalı değil.
+        });
+    });
+ }
 
 ```
