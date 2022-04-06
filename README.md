@@ -764,3 +764,15 @@ namespace ThreadSamplesContinue
 
 ```
 
+### CancellationToken Kullanımı
+
+> Bir asenkron işlem başlatırken bazen bu işlemler çok uzun sürebilir. Ve bu uzun sürme anında bazen bu başlatmış olduğumuz asenkron işlemi iptal etmek isteyebiliriz.
+> Mesela 30 dk sürecek bir asenkron işlem başlattınız , bu işlemi herhangi bir zaman diliminde iptal edebilirsiniz mesela 10. dakikasında iptal edebilirsiniz.
+> İşte bu iptal işleminde CancellationToken adlı bir yapıdan faydalanıyoruz.
+> Bir asenkron işlem başlatırken buna bir token veriyoruz ve daha sonra bu token ' ı iptal ettiğimiz zaman başlatmış olduğumuz asenkron operasyonda iptal olmuş oluyor.
+ 
+
+```csharp
+
+
+```
