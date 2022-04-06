@@ -839,10 +839,82 @@ public class HomeController : ControllerBase
 ```
 #### Web Tarafında İnceleme
 
-> Mesela Controller içerisinde bir IActionResult methodunuz var bu methodun içerisindeki async method dun da yaptığı işlem 
+> Mesela Controller içerisinde bir IActionResult methodunuz var bu methodun içerisindeki async method dun da yaptığı işlem 10dk sürebilir , yani bir request yapıldığında 10 dk sürebilir response işleminin tamamlanması bu uzun işlemlerinizi CancellationToken kullanarak iptal edebilirsiniz.
+
+> Nasıl meydana geliyor bu iptal olayı; kullanıcı bir istek yaptıktan sonra ilgili sekmeyi kapatırsa veya sayfayı refresh işlemi gerçekleştirirse , CancellationToken devreye girecek ve isteği sonlandıracak.
+
+> Eğer CancellationToken kullanmazsak kullanıcı sayfayı kapatırsa veya sayfayı refresh yaparsa o istek arka planda çalıştırılmaya devam edecek ve sizin kaynaklarınızı tüketecek. Bu kaynak tüketimini engellemek için uzun süren işlemlerde CancellationToken kullanılabilir.
+
+> Heryerde kullanmaya gerek yok sadece uzun süren async method larda kullanmak faydalı olacaktır.
 
 ```csharp
 
+namespace Task.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class HomeController : ControllerBase
+    {
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContentAsync()
+        {
+            _logger.LogInformation("istek başladı.");
+            Thread.Sleep(5000);
+            var mytask = new HttpClient().GetStringAsync("http://www.google.com");
+            var response = await mytask;
+            _logger.LogInformation("istek başladı.");
+            return Ok(response);
+        }
+    }
+}
+
+
+```
+
+> Yerine CancellationToken kullanarak nasıl yapabiliriz onu gösterelim.
+
+```csharp
+namespace Task.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class HomeController : ControllerBase
+    {
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContentAsync(CancellationToken cancellationToken) // Bu parametreyi geçtiğimiz andan itibaren artık sayfayı işlem tamamlanmadan kapatırsak hemen TaskCanceledException fırlatacaktır. 
+        {   // Bu TaskCanceledException ı ınıda aşağıda try catch blogu üzerinden handle edelim.
+            try
+            {
+                _logger.LogInformation("istek başladı.");
+                await System.Threading.Tasks.Task.Delay(5000, cancellationToken); // Delay ile async bir gecikmeyi simule ettik. Delay in 4. overload u zaman ve cancellationtoken alıyor bunu kullandık o yuzden.
+                // cancellationToken.ThrowIfCancellationRequested(); Eğer Async method kullanmıyorsam ama işlemimiz yine uzun sürüyorsa ThrowIfCancellationRequested ile de manuel olarak TaskCanceledException ı fırlattırabilirsiniz.
+                var mytask = new HttpClient().GetStringAsync("http://www.google.com");
+                var response = await mytask;
+                _logger.LogInformation("istek başladı.");
+                return Ok(response);
+            }
+            catch (System.Exception e)
+            {
+                _logger.LogInformation("İstek İptal edildi." + e.Message);
+                return BadRequest(e.Message);
+            }
+        }
+    }
+}
 
 
 ```
