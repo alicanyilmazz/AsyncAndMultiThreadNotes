@@ -926,8 +926,9 @@ namespace Task.API.Controllers
 
 > Aşağıda da senkron olan bir uzun süren bir business methodunun çağırımını  Thread.Sleep(1000); ile simule ettiğimizi düşününüz Enumerable.Range(1, 10).ToList().ForEach(x => kodumun bu methodu 10 kere çağırıp çalıştıracak gibi düşününüz.
 
-> Döngünün 5 veya 6 sırasında sonraki business method çağırımı iptal olursa herhangi bir durumdan dolayı (WinForm da durdur butonu (token.Cancel()) ile bunu yapıyorduk hatırlarsanız , veya browserda sayfaya yapılan isteğin iptal edilmesi sayfanın kapatılması) 
-tabi burda Thread.Sleep(1000); iptal olmayacak ama bunu bir senkron business methodu gibi düşünürseniz ve orda yapılacak bir durumdan dolayı burdaki çağırımın iptal oldugunu düşünürsek işte bu durumda (bu durum döngünün 5. çağırımında gerçekleşsin.) o zaman try dan çıkıp catch e girecek bizde bu olayı handle edebiliyor olacağız.
+> Döngünün 5 veya 6 sırasında sonraki business method çağırımı iptal olursa herhangi bir durumdan dolayı (WinForm da durdur butonu (token.Cancel()) ile bunu yapıyorduk hatırlarsanız , veya browserda sayfaya yapılan isteğin iptal edilmesi sayfanın kapatılması).
+
+> Tabi burda Thread.Sleep(1000); iptal olmayacak ama bunu bir senkron business methodu gibi düşünürseniz ve orda yapılacak bir durumdan dolayı burdaki çağırımın iptal oldugunu düşünürsek işte bu durumda (bu durum döngünün 5. çağırımında gerçekleşsin.) o zaman try dan çıkıp catch e girecek bizde bu olayı handle edebiliyor olacağız.
 
 > senkron bir methodun çağırdığımız zaman kodda da bu şekilde manuel olarak token iptal edilebilir.
 
