@@ -837,3 +837,12 @@ public class HomeController : ControllerBase
 // O zaman diyebiliriz ki herbir asenkron methodun illaki CancellationToken 'ı olacak diye bir durum yok overload larına bakıp incelememiz gerekiyor.
 
 ```
+#### Web Tarafında İnceleme
+
+> Mesela Controller içerisinde bir IActionResult methodunuz var bu methodun içerisindeki async method dun da yaptığı işlem 
+
+```csharp
+
+
+
+```
