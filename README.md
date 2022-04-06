@@ -776,6 +776,8 @@ namespace ThreadSamplesContinue
 
 > WindowsFrom üzerinde inceleyelim öncelikle sonrasında API tarafında da inceleyeceğiz.
 
+#### WinForm Üzerinde İnceleme
+
 ```csharp
 
 // 2 Buttonda erişebilsin diye Globalde tanımladık.
