@@ -715,6 +715,52 @@ namespace ThreadSample
 
 ```csharp
 
+namespace ThreadSamplesContinue
+{
+    internal class Program
+    {
+        public static string CacheData { get; set; }
+        static async void Main(string[] args)
+        {
+            CacheData = await GetDataAsync();
+        }
 
+        public static Task<string> GetDataAsync()
+        {
+            if (String.IsNullOrEmpty(CacheData))
+            {
+                return File.ReadAllTextAsync("sample.txt");
+            }
+            else
+            {
+                return Task.FromResult<string>(CacheData);
+            } 
+        }
+    }
+}
 
 ```
+
+> Not: Aşağıdaki gibi kullanımlar oldugunu da hatırlatalım.
+
+```csharp
+
+    Task.FromResult("alican"); şeklinde kullanılabileceği gibi diğer overload edilen constructure larına baktığımız zaman generic tip güvenli halleride vardır.
+    Task.FromResult<string>("alican") gibi
+
+    Aynı şekilde, bu durum Task.Run() methodu içinde geçerlidir.
+    
+    Task.Run(() => {
+        return "alican";
+    });
+
+    şeklinde kullanılabileceğimiz gibi , 
+    
+    Task.Run<string>(() => {
+        return "alican";
+    });
+    
+    şeklinde tip güvenli hale de getirebiliriz.
+
+```
+
