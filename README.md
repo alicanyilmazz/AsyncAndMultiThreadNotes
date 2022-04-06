@@ -996,6 +996,8 @@ namespace Task.API.Controllers
 
 > İşte bu gibi durumlarda Result property si üzerinden Thread i bloklayark istediğiniz data yı alabilirsiniz.
 
+> 1. Kullanım " Senkron method içerisinde çağırılmış olan Asenkron method un sonucunu almak için kullanılır. "
+
 ##### Console App Üzerinde Gösterelim
 
 ```csharp
@@ -1019,6 +1021,7 @@ namespace TaskInstanceSample
 // Ben bunun içerisinde async method kullanacağım async method kullanabilmek içinde await keyword ' üne ihtiyacım var 
 // Ama benim GetData Methodum sync bir method geriye Task<string> dönmüyor string dönüyor geriye.
 // İşte burda Result propertisi devreye giriyor. Sonucu alırken Thread i blokladığından dolayı GetData() methodu geriye string dönmesi sorun olmuyor öyle olmasaydı Task<string> dönmesini isteyecekti.
+// ÖNEMLİ NOT : Result property si thread i öncesinde veriyi await ile alsaydık (alındığını garantileseydi) thread i bloklamayacaktı burda bloklamasının nedeni çünkü öncesinde ContinueWith gibi await gibi verinin kesin geldiğine dair bir şey yok dolaysıyla işlemin bittiğini return yapmadan önce garanti altına alması için yukarıda return task.Result; kısmında Result thread i blokluyor. Detaylarına aşağıda değineceğiz.
 ```
 
 ##### WinForm App Üzerinde Gösterelim
@@ -1029,4 +1032,29 @@ namespace TaskInstanceSample
     var myTask = new HttpClient().GetStringAsync("https://www.hepsiburada.com");
     string data = mytask.Result; // Tabi bu veriyi biryere dönmüyoruz zira BntReadFile_Click bir buton clickleme event i. // Veri data ' ya gelene kadar UI   donacaktır.
   }
+```
+> 2. Kullanım " Senkron method içerisinde çağırılmış olan Asenkron method un sonucunu almak için kullanılır. "
+
+```csharp
+ 
+ private async void Main()
+ {
+     var task = new HttpClient().GetStringAsync("https://www.google.com");
+     await task;  // Burada Data nın geldiği kesin await keyword ü var çünkü
+     var data = task.Result; // Burda Thread Bloklanmaz çünkü yukarıda verinin geldiği kesin.
+ }
+  
+```
+
+```csharp
+ 
+        private async void Main()
+        {
+            var task = new HttpClient().GetStringAsync("https://www.google.com").ContinueWith((data) =>
+            {
+                var d = data.Result; // Burda da Result property si Thread imizi herhangi bir şekilde bloklamaz çünkü ContinueWith data nın geldiğinde çalıştırılacaktır.
+            });
+            
+        }
+  
 ```
