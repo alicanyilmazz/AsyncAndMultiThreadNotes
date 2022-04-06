@@ -975,3 +975,58 @@ namespace Task.API.Controllers
 
 
 ```
+
+#### Task Instance
+
+> Şu ana kadar Task sınıfımızın static methodlarını inceledik şimdi ise Task sınıfımızın nesne üzerinden gelen instance üzerinden ulaşağımız methodlarını inceleyeceğiz. 
+
+> Task class ımızın instance üzerinden gelen Result propertisini inceleyeceğiz.
+
+> Bildiğiniz gibi biz async method çağırımları yaptığımız zaman geriye bize yeni bir Task instance ' ı dönüyordu.
+
+> Bu dönen örneğin bir tane Result isminde propertisi var.
+
+> Bu property ile beraber biz dönen datayı alabiliriz.
+
+> Yalnız bu Result propertisinin şöyle bir dezavantajı var bu result propertisi bizim o anki thread imizi bloklayan bir property.
+
+> Peki neden böyle bir property ' ye ihtiyaç duyulmuş ?
+
+> Bunun sebebi siz sync bir method içerisinden async bir method çağıracaksınız ama methodunuzda geriye herhangi bir Task vs dönmüyorsunuz.
+
+> İşte bu gibi durumlarda Result property si üzerinden Thread i bloklayark istediğiniz data yı alabilirsiniz.
+
+##### Console App Üzerinde Gösterelim
+
+```csharp
+namespace TaskInstanceSample
+{
+    internal class Program
+    {
+        static async Task Main(string[] args)
+        {
+            Console.WriteLine(GetData());
+        }
+
+        public static string GetData()
+        {
+            var task = new HttpClient().GetStringAsync("http://www.google.com");
+
+            return task.Result; // Burada thread bloklanır eğer UI Thread ise application donar.
+        }
+    }
+}
+// Ben bunun içerisinde async method kullanacağım async method kullanabilmek içinde await keyword ' üne ihtiyacım var 
+// Ama benim GetData Methodum sync bir method geriye Task<string> dönmüyor string dönüyor geriye.
+// İşte burda Result propertisi devreye giriyor. Sonucu alırken Thread i blokladığından dolayı GetData() methodu geriye string dönmesi sorun olmuyor öyle olmasaydı Task<string> dönmesini isteyecekti.
+```
+
+##### WinForm App Üzerinde Gösterelim
+
+```csharp
+  private async void BntReadFile_Click(Object sender, EventArgs e)
+  {
+    var myTask = new HttpClient().GetStringAsync("https://www.hepsiburada.com");
+    string data = mytask.Result; // Tabi bu veriyi biryere dönmüyoruz zira BntReadFile_Click bir buton clickleme event i. // Veri data ' ya gelene kadar UI   donacaktır.
+  }
+```
