@@ -904,7 +904,7 @@ namespace Task.API.Controllers
                 // cancellationToken.ThrowIfCancellationRequested(); Eğer Async method kullanmıyorsam ama işlemimiz yine uzun sürüyorsa ThrowIfCancellationRequested ile de manuel olarak TaskCanceledException ı fırlattırabilirsiniz.
                 var mytask = new HttpClient().GetStringAsync("http://www.google.com");
                 var response = await mytask;
-                _logger.LogInformation("istek başladı.");
+                _logger.LogInformation("istek bitti.");
                 return Ok(response);
             }
             catch (System.Exception e)
