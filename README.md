@@ -996,7 +996,7 @@ namespace Task.API.Controllers
 
 > İşte bu gibi durumlarda Result property si üzerinden Thread i bloklayark istediğiniz data yı alabilirsiniz.
 
-> 1. Kullanım " Senkron method içerisinde çağırılmış olan Asenkron method un sonucunu almak için kullanılır. "
+> 1. Kullanım `" Senkron method içerisinde çağırılmış olan Asenkron method un sonucunu almak için kullanılır. "`  
 
 ##### Console App Üzerinde Gösterelim
 
@@ -1033,7 +1033,7 @@ namespace TaskInstanceSample
     string data = mytask.Result; // Tabi bu veriyi biryere dönmüyoruz zira BntReadFile_Click bir buton clickleme event i. // Veri data ' ya gelene kadar UI   donacaktır.
   }
 ```
-> 2. Kullanım " Senkron method içerisinde çağırılmış olan Asenkron method un sonucunu almak için kullanılır. "
+> 2. Kullanım ` "  "`
 
 ```csharp
  
@@ -1058,3 +1058,4 @@ namespace TaskInstanceSample
         }
   
 ```
+`` 
