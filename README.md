@@ -901,7 +901,7 @@ namespace Task.API.Controllers
             {
                 _logger.LogInformation("istek başladı.");
                 await System.Threading.Tasks.Task.Delay(5000, cancellationToken); // Delay ile async bir gecikmeyi simule ettik. Delay in 4. overload u zaman ve cancellationtoken alıyor bunu kullandık o yuzden.
-                // cancellationToken.ThrowIfCancellationRequested(); Eğer Async method kullanmıyorsam ama işlemimiz yine uzun sürüyorsa ThrowIfCancellationRequested ile de manuel olarak TaskCanceledException ı fırlattırabilirsiniz.
+                
                 var mytask = new HttpClient().GetStringAsync("http://www.google.com");
                 var response = await mytask;
                 _logger.LogInformation("istek bitti.");
@@ -915,6 +915,62 @@ namespace Task.API.Controllers
         }
     }
 }
+
+
+```
+> NOT :  cancellationToken.ThrowIfCancellationRequested(); Eğer Async method kullanmıyorsam ama işlemimiz yine uzun sürüyorsa ThrowIfCancellationRequested ile de manuel olarak TaskCanceledException ı fırlattırabilirsiniz.
+
+#### Maunel olarak token iptali
+
+> Yukarıdaki Task.Delay(1000,cancellationToken); bir asenkron işlemi simule etmek için kullanılmıştı çünkü bütün kodları tamamlama imkanımız yok onu bu işlemi uzun süren async bir business method unun cağrımı gibi düşünebilirsiniz demiştik.
+
+> Aşağıda da senkron olan bir uzun süren bir business methodunun çağırımını  Thread.Sleep(1000); ile simule ettiğimizi düşününüz Enumerable.Range(1, 10).ToList().ForEach(x => kodumun bu methodu 10 kere çağırıp çalıştıracak gibi düşününüz.
+
+> Döngünün 5 veya 6 sırasında sonraki business method çağırımı iptal olursa herhangi bir durumdan dolayı (WinForm da durdur butonu (token.Cancel()) ile bunu yapıyorduk hatırlarsanız , veya browserda sayfaya yapılan isteğin iptal edilmesi sayfanın kapatılması) 
+tabi burda Thread.Sleep(1000); iptal olmayacak ama bunu bir senkron business methodu gibi düşünürseniz ve orda yapılacak bir durumdan dolayı burdaki çağırımın iptal oldugunu düşünürsek işte bu durumda (bu durum döngünün 5. çağırımında gerçekleşsin.) o zaman try dan çıkıp catch e girecek bizde bu olayı handle edebiliyor olacağız.
+
+> senkron bir methodun çağırdığımız zaman kodda da bu şekilde manuel olarak token iptal edilebilir.
+
+> IActionResult methodumuz async , biz bunun içerisinde başka bir async veya sync bir methodu çağırırken cancellationtoken kullanarak işlem iptalini nasıl yaparız onu görmüş olduk.
+
+```csharp
+
+namespace Task.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class HomeController : ControllerBase
+    {
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContentAsync(CancellationToken cancellationToken) // Bu parametreyi geçtiğimiz andan itibaren artık sayfayı işlem tamamlanmadan kapatırsak hemen TaskCanceledException fırlatacaktır. 
+        {   // Bu TaskCanceledException ı ınıda aşağıda try catch blogu üzerinden handle edelim.
+            try
+            {
+                _logger.LogInformation("istek başladı.");
+                Enumerable.Range(1, 10).ToList().ForEach(x => // Bu arkadaş 10 kere dönecek ve her 10 kere döndüğünde 1 sn ye uyuyacak.
+                {
+                    Thread.Sleep(1000);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }); 
+                _logger.LogInformation("istek bitti.");
+                return Ok();
+            }
+            catch (System.Exception e)
+            {
+                _logger.LogInformation("İstek İptal edildi." + e.Message);
+                return BadRequest(e.Message);
+            }
+        }
+    }
+}
+
 
 
 ```
