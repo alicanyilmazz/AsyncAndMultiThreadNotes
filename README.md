@@ -767,12 +767,71 @@ namespace ThreadSamplesContinue
 ### CancellationToken Kullanımı
 
 > Bir asenkron işlem başlatırken bazen bu işlemler çok uzun sürebilir. Ve bu uzun sürme anında bazen bu başlatmış olduğumuz asenkron işlemi iptal etmek isteyebiliriz.
+
 > Mesela 30 dk sürecek bir asenkron işlem başlattınız , bu işlemi herhangi bir zaman diliminde iptal edebilirsiniz mesela 10. dakikasında iptal edebilirsiniz.
+
 > İşte bu iptal işleminde CancellationToken adlı bir yapıdan faydalanıyoruz.
+
 > Bir asenkron işlem başlatırken buna bir token veriyoruz ve daha sonra bu token ' ı iptal ettiğimiz zaman başlatmış olduğumuz asenkron operasyonda iptal olmuş oluyor.
- 
+
+> WindowsFrom üzerinde inceleyelim öncelikle sonrasında API tarafında da inceleyeceğiz.
 
 ```csharp
 
+// 2 Buttonda erişebilsin diye Globalde tanımladık.
+CancellationTokenSource ct = new CancellationTokenSource(); // CancellationToken oluşturmak için CancellationTokenSource class ından bir nesne oluşturuyorum ki bu class üzerinden bir CancellationToken alacağım. 
+
+private async void button1_Click(object sender , EventArgs e) // Veri getirme butonu
+{
+    try
+    {
+        Task<HttpResponseMessage> myTask;
+
+        myTask = new HttpClient().GetAsync().GetAsync("https://localhost:44366/api/home", ct.Token);
+
+        await myTask;
+
+        var content = myTask.Result.Content.ReadAsStringAsync(); // GetStringAsync de doğrudan string dönüyordu ama GetAsync den Content.ReadAsStringAsync ile veriyi okuyoruz.
+
+        richTextBox1.Text = content;
+    }
+    catch (TaskCanceledException ex)
+    {
+        MessageBox.Show(ex.Message);
+    }
+
+    // myTask.isCancelled --> Cancel olup olmadığını
+    // myTask.IsCompleted --> Veya tamamlanıp tamamlanmadığını kontrol edebiliriz.
+}
+
+private async void button2_Click(object sender, EventArgs e) // İptal Butonu
+{
+    ct.Cancel(); // Cancel() işlemi ile birlikte TasCanceledException fırlatır her zaman o zaman bu exception ı yakalarsam durdurma işlemini de yakalarım.
+}
+
+[Route("api/[controller]")]
+[ApiController]
+public class HomeController : ControllerBase
+{
+
+    [HttpGet]
+    public async Task<IActionResult> GetContentAsync()
+    {
+        Thread.Sleep(5000);
+        var myTask = new HttpClient().GetStringAsync("https://www.google.com");
+        var data = await myTask;
+        return ok(data);
+    }
+
+}
+
+// Bir asenkron methodun token alabilmesi için mutlaka bir constructure ında bir overload ' un olması lazım.
+// Her asenkron methodun token parametresi olmayabilir.
+// Örneğin ,
+// new HttpClient().GetStringAsync() -> methoduna bakarsak GetStringAsync() methodunun 2 overload ı oldugunu göreceksiniz ve parametre olarak token alan bir constructure ' ı yok.
+// Aynı sınıfın şimdide GetAsync() -> methoduna bakarsak GetStringAsync methodunun 4. overload ın da parametre olarak CancellationToken alan bir constructure ' ını görebiliriz.
+// new HttpClient().GetAsync() --> 4. constructure ' ı parametre olarak CancellationToken alıyor demekki ben bu başlayan işlemi bu token üzerinden iptal edebilirim.
+
+// O zaman diyebiliriz ki herbir asenkron methodun illaki CancellationToken 'ı olacak diye bir durum yok overload larına bakıp incelememiz gerekiyor.
 
 ```
