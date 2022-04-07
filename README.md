@@ -1050,10 +1050,10 @@ namespace TaskInstanceSample
  
  private async void Main()
  {
-      var task = new HttpClient().GetStringAsync("https://www.google.com").ContinueWith((data) =>
-      {
-          var d = data.Result; // Burda da Result property si Thread imizi herhangi bir şekilde bloklamaz çünkü ContinueWith data nın geldiğinde çalıştırılacaktır.
-      });           
+     var task = new HttpClient().GetStringAsync("https://www.google.com").ContinueWith((data) =>
+     {
+         var d = data.Result; // Burda da Result property si Thread imizi herhangi bir şekilde bloklamaz çünkü ContinueWith data nın geldiğinde çalıştırılacaktır.
+     });           
  }
   
 ```
