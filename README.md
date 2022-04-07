@@ -1,5 +1,7 @@
 # AsyncAndMultiThreadNotes
 
+`Asenkron Programlama; asenkron methodları hangi thread den çağırdıysak o thread in bloklanmaması üzerine kuruludur.`
+
 ## Asycn İşlemlerin Tanımlanması
 
 |                |Async                          |Sync                         |
@@ -1207,5 +1209,9 @@ namespace ValueTaskSample
 ```
 > ilk önce 1 numaralı adım çalıştırılır , sonrasında 2 numaralı adım çalıştırılır , ve method çağırlır 5 numaralı adım çalıştırılır , sonrasında 6 numaralı adım
  çalıştırlır fakat 6 numaralı adım da await oldugundan bu uzun sürecek bir işlem ana thread bloklanmaz ve hemen 3 numaralı adım çalıştılır , sonrasında 4 numaralı adım calıstırılır fakat burda da await var işte burda veri gelene kadar thread imiz bekler alt satıra gidilmez peki method içerisinde iken neden `GetStringAsync` dönmesini await olmasına ragmen beklemedi cagırıldıgı yere dönüp kodu işletmeye devam etti çünkü o cağıran üst method eğer  GetContent() da içersinde başka bir methoda gitseydi oda içinde async bir method cagırsaydı ve basında da await olsaydı o zaman oda beklemeden  `GetContent` methoduna dönecekti ,  `Main` içerisindeki await de beklemek zorunda cunku main den sonra kodun çağırılabileceği bir yer yok.
+
+### Task Parallel Library (TPL)
+
+
 
 `` 
