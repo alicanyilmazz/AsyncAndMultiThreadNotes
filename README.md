@@ -1212,6 +1212,109 @@ namespace ValueTaskSample
 
 ### Task Parallel Library (TPL)
 
+#### Race Condition
+> Çok thread li uygulamalarda birden çok thread in paylaşılan bir hafıza alanına aynı anda erişmeye çalışması ile bu durum meydana gelir.
 
+> Multithread programlamada kullanmış oldugunuz thread ler paylaşımlı bir data ya erişmeye çalışıyorsa bu durumu mutlaka göz önünde bulundurmanız gerekiyor yoksa kodalarınız istediğiniz davranışı sergileyemeyebilir.
+
+> Bunu engellemek için genelde paylaşımlı data lock lanır ki ilgili thread in işi bitmeden diğer thread aynı data üzerinde işlem yapamasın.
+
+#### Parallel.ForEach
+
+> Bu method içerisine almış oldugu bir Array i ve Array içerisindeki item ları farklı thread lerde çalıştırarak multithread bir kod yazmamıza imkan verir.
+
+> `ÖNEMLİ : Öncelikle şunu belirtelim Multithread her zaman hızlıdır diye bir durum söz konusu değildir eğer veriniz küçükse yapılacak işlem cok yoğun uzun süren kompleks şeyler içermiyorsa single thread multithread den daha hızlı çalışması olasıdır. Çünkü Multithread de iş parçacıklarının bölünmesi bunları çalıştıracak thread lerin thread pool dan getirilmesi bunların hepsi bir maliyet unsurudur o yuzden yuksek iş yükü olan işlerde kullanmak daha mantıklıdır.` 
+ 
+```csharp
+ 
+namespace ParallelForEach1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // FOREACH MULTITHREAD SAMPLE
+
+            Stopwatch sw = Stopwatch.StartNew();
+
+            sw.Start();
+
+            string picturesPath = @"C:\Users\Alican\Desktop\Pictures"; // Masaüstümüzde 20 tane kadar resim içeren bir dosyamız var oda dosyamızın path ' dir.
+
+            var files = Directory.GetFiles(picturesPath); // Dosya içerisindeki herbir resmin dosya yolunu files string array ' ine koyduk.
+
+            Parallel.ForEach(files, (item) =>   // item herbir string dizindeki eleman item değişkeni içerisine yerleştirilir.
+            {
+                Console.WriteLine("Thread no: " + Thread.CurrentThread.ManagedThreadId);
+                Image image = new Bitmap(item);
+                var thumbnail = image.GetThumbnailImage(50, 50, () => false, IntPtr.Zero);
+                thumbnail.Save(Path.Combine(picturesPath,"thumbnail",Path.GetFileName(item)));
+            });
+
+            sw.Stop();
+
+            Console.WriteLine("Process ended " + sw.ElapsedMilliseconds);
+
+            sw.Reset();
+
+            // AYNI İŞLEMİ NORMAL FOREACH İLE DE AŞAĞIDA DENİYORUZ.
+
+            sw.Start();
+
+            files.ToList().ForEach(x =>
+            {
+                Console.WriteLine("Thread no: " + Thread.CurrentThread.ManagedThreadId);
+                Image image = new Bitmap(x);
+                var thumbnail = image.GetThumbnailImage(50, 50, () => false, IntPtr.Zero);
+                thumbnail.Save(Path.Combine(picturesPath, "thumbnail", Path.GetFileName(x)));
+            });
+
+            sw.Stop();
+
+            Console.WriteLine("Process ended " + sw.ElapsedMilliseconds);
+        }
+    }
+}
+
+  
+```
+##### Parallel.ForEach Paylaşımlı Data Üzerinde Çalışmak
+
+```csharp
+ 
+namespace ParallelForEach2
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            long FileByte = 0; // Herbir resim dosyanının boyutunu bu değişkene kaydedeceğiz.
+
+            Stopwatch sw = Stopwatch.StartNew();
+
+            sw.Start();
+
+            string picturesPath = @"C:\Users\Alican\Desktop\Pictures"; // Masaüstümüzde 20 tane kadar resim içeren bir dosyamız var oda dosyamızın path ' dir.
+
+            var files = Directory.GetFiles(picturesPath); // Dosya içerisindeki herbir resmin dosya yolunu files string array ' ine koyduk.
+
+            Parallel.ForEach(files, (item) =>   // item herbir string dizindeki eleman item değişkeni içerisine yerleştirilir.
+            {
+                Console.WriteLine("Thread no: " + Thread.CurrentThread.ManagedThreadId);
+                FileInfo file = new FileInfo(item);
+
+                Interlocked.Add(ref FileByte, file.Length); // Interlock methodu FileByte a aynı anda birden fazla thread in erişmesin engeller o yüzden Race Condition oluşmaz.
+                Interlocked.Decrement(ref FileByte);
+                Interlocked.Exchange(ref FileByte, file.Length); // Exchange ilede değer i değiştirebiliriz.
+            });
+
+            sw.Stop();
+
+            Console.WriteLine("Process ended " + sw.ElapsedMilliseconds);
+        }
+    }
+}
+
+```
 
 `` 
