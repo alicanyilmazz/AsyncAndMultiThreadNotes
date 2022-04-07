@@ -1120,6 +1120,57 @@ namespace TaskPropertiesExplaned
   
 ```
 
+### ValueTask
 
+> ValueTask ' ler c# a yeni gelen bir tipimiz , neden böyle bir tip geldi biraz ondan bahsedelim.
+
+> Bizim şu ana kadar inceledeiğimiz
+
+> `Task` `tipimiz bir class ' tır. Yani reference type ' dır.`
+
+> `ValueTask` `tipimiz bir struct ' tır. Yani value type ' dır.`
+
+> Peki neden böyle bir yapıya ihtiyaç duyulmuştur.
+
+> Value type ' lar memory mizin Stack inde tutulur iken , Reference tipler memory mizin Heap alanında tutulur. (nesne kısmı heap - adresi tutan referans stack bölgesinde).
+
+> Heap bölgesinde tutulan dataları GC silebilir ve bu maliyetli bir işlemdir. Belirli aralıklarla referansı olmayan yapıları siler memory i temizler. Bu yüzden Referans tipler maliyetlidir.
+
+> Stack bölgesinde tutulan data lar ise herhangi bir scope dan cıktıgı anda bellekten otomatik bir şekilde düşer.
+
+> Bir method içerisinde int değer kullanmak gibi veya struct gibi bir yapı kullanmak gibi.
+
+> Biz her asycn method dan Task dönmesi heap bölgesinde yeni bir alanın allocate edilmesi anlamına geliyor.
+
+> Eğer yogun bir iş gerektirmeyen bir async method dan data döndüğünüz zaman yeni bir Task dönmek yerine belleğin Stack bölgesinde tutulacak `ValueTask` isminde bir tip dönelim demişler ve bu şekilde memory i daha performanslı kullanalım demişler.
+
+```csharp
+ 
+namespace ValueTaskSample
+{
+    internal class Program
+    {
+        private static int cacheData { get; set; } = 150;
+        static async void Main(string[] args)
+        {
+            await GetData();
+            await GetDataWith(); // Hızlı verinin geleceğini bildiğimiz yerlerde ValueTask i kullanabiliriz. Memory deki bir veriyi getirmek gibi.
+            // Ayrıca ValueTask , Task Class ının sahip oldugu methodların aynısına yine sahiptir.
+        }
+
+        public static Task<int> GetData()
+        {
+            return Task.FromResult(cacheData);
+        }
+
+        public static ValueTask<int> GetDataWith()
+        {
+            return new ValueTask<int>(cacheData);
+        }
+    }
+}
+
+  
+```
 
 `` 
