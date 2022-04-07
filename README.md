@@ -996,6 +996,8 @@ namespace Task.API.Controllers
 
 > İşte bu gibi durumlarda Result property si üzerinden Thread i bloklayark istediğiniz data yı alabilirsiniz.
 
+#### Task Instance Result Property
+
 > 1. Kullanım `" Senkron method içerisinde çağırılmış olan Asenkron method un sonucunu almak için kullanılır. "`  
 
 ##### Console App Üzerinde Gösterelim
