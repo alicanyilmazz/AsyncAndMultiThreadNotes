@@ -1033,7 +1033,7 @@ namespace TaskInstanceSample
     string data = mytask.Result; // Tabi bu veriyi biryere dönmüyoruz zira BntReadFile_Click bir buton clickleme event i. // Veri data ' ya gelene kadar UI   donacaktır.
   }
 ```
-> 2. Kullanım ` "  "`
+> 2. Kullanım ` "Verinin geldiği kesin olan durumlarda await veya ContinueWith kullanımı gibi Thread i bloklamadan veriyi almamızı sağlar."`
 
 ```csharp
  
