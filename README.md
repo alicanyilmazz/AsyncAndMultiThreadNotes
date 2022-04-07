@@ -1059,4 +1059,67 @@ namespace TaskInstanceSample
  }
   
 ```
+#### Task Instance Properties
+
+> Bu kısımda Task class ımızın property ' lerini inceleyeceğiz , bu property ler gerçekten bize işleme koyduğumuz Task ile ilgili çok değerli bilgiler gönderiyor.
+
+> Mesela bir Task in başarılı bir şekilde tamamlanıp tamamlanmadığı , başka bir method tarafından cancel edilip edilmediği gibi ekstra bilgiler veriyor.
+
+> Veya bu Task içerisindeki işlem bir exception fırlatmışsa bunu bize veriyor.
+
+```csharp
+ 
+  namespace TaskPropertiesExplaned
+{
+    internal class Program
+    {
+        static async void Main(string[] args)
+        {
+            Task myTask = Task.Run(() =>
+            {
+                Console.WriteLine("myTask runned.");
+            });
+
+            await myTask; // Buraya DebugPrint koy // Sonrasında Watch özelliğine myTask yaz // IsCancelled , Exception , IsCompleted , IsCompletedSuccessfully , IFaulted gibi tüm bu sınıfa ait özellikler i görebilirsin.
+
+            // myTask.IsCompleted // gibi kod içerisinde de görebilirsin istersen.
+            // myTask.IsCanceled  // gibi kod içerisinde de görebilirsin istersen.
+
+            Console.WriteLine("myTask ended.");
+        }
+    }
+}
+
+// IsCompletedSuccessfully --> Bizim Task imizin herhangi bir exception fırlatmadan başarı ile sonuclandıgının göstergesidir.
+// IsCompleted --> Task bir exception fırlatsada fırlatmasada işlemin bittiğinin göstergesidir.
+// IsFaulted --> Task imizin bir exception fırlatırsa true fırlatmazsa false olacaktır.
+
+// Mesela Debug yaparken F10 yapıp await myTask; geçince  IsCompletedSuccessfully = true olacak , IsCompleted = true olacak , Status = RanToCompletion olacak zira await satırını geçtik çalışma bitti. cw kısmındayız debug da.
+  
+```
+
+```csharp
+ 
+namespace TaskPropertiesExplaned
+{
+    internal class Program
+    {
+        static async void Main(string[] args)
+        {
+            Task myTask = Task.Run(() =>
+            {
+                throw new ArgumentException("Opps An Error");
+            });
+
+            await myTask; // Burada ise Watch kısmında 'myTask' i yazıp bakarsak , Exception : Count = 1 olarak göreceksiniz. IsCompleted : True , IsCompletedSuccessfully : False
+
+            Console.WriteLine("myTask ended.");
+        }
+    }
+}
+  
+```
+
+
+
 `` 
