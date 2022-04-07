@@ -1172,5 +1172,41 @@ namespace ValueTaskSample
 
   
 ```
+### Task ' ın Akış Durumu
+
+> Aşağıdaki kod blogu üzerinden inceleyelim.
+
+```csharp
+ 
+ namespace TaskFlow
+{
+    internal class Program
+    {
+        static async void Main(string[] args)
+        {
+            Console.WriteLine("1. Adım");  // 1 Numaralı Adım
+
+            var myTask = GetContent();     // 2Numaralı Adım
+
+            Console.WriteLine("2. Adım");  // 3 Numaralı Adım
+
+            var content = await myTask;    // 4 Numaralı Adım
+
+            Console.WriteLine("3. Adım"+content.Length); 
+        }
+
+        public static async Task<string> GetContent() // 5 Numaralı Adım
+        {
+           var content = await new HttpClient().GetStringAsync("https://www.google.com"); // 6 Numaralı Adım
+           
+            return content;
+        }
+    }
+}
+  
+```
+> ilk önce 1 numaralı adım çalıştırılır , sonrasında 2 numaralı adım çalıştırılır , ve method çağırlır 5 numaralı adım çalıştırılır , sonrasında 6 numaralı adım
+
+> çalıştırlır fakat 6 numaralı adım da await oldugundan bu uzun sürecek bir işlem ana thread bloklanmaz ve hemen 3 numaralı adım çalıştılır , sonrasında 4 numaralı adım calıstırılır fakat burda da await var işte burda veri gelene kadar thread imiz bekler alt satıra gidilmez peki method içerisinde iken neden `GetStringAsync` dönmesini await olmasına ragmen beklemedi cagırıldıgı yere dönüp kodu işletmeye devam etti çünkü o cağıran üst method eğer  GetContent() da içersinde başka bir methoda gitseydi oda içinde async bir method cagırsaydı ve basında da await olsaydı o zaman oda beklemeden  `GetContent` methoduna dönecekti ,  `Main` içerisindeki await de beklemek zorunda cunku main den sonra kodun çağırılabileceği bir yer yok.
 
 `` 
